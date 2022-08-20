@@ -1,0 +1,8 @@
+body {
+    background-color: rgba(54, 194, 159, 0.5);
+}
+
+.submitButton {
+    background-color: #36c29f !important;
+    color: white !important;
+}
