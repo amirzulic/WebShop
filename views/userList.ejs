@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebShop</title>
+    <title><%= title %></title>
     <link rel="icon" href="https://icon-library.com/images/online-store-icon/online-store-icon-3.jpg">
-    <link rel='stylesheet' href='/stylesheets/error.css' />
+    <link rel='stylesheet' href='/stylesheets/userList.css' />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
 </head>
 <body>
@@ -32,19 +32,56 @@
         </form>
     </div>
 </nav>
-<br>
-<hr class="border-1 border-grey">
-<br>
 <div class="row container-fluid">
-    <div class="col text-center">
-        <img src="https://pbs.twimg.com/profile_images/1049456976248365057/4dZBsdT0_400x400.jpg">
-    </div>
+    <br>
+</div>
+<div class="row container-fluid">
     <div class="col">
-        <h1>You don't have that permission :(</h1>
-        <h4>Sorry!</h4>
+        <h3>Hi <%= user %></h3>
+    </div>
+    <div class="col text-right">
+        <form action="/logout?_method=DELETE" method="POST">
+            <button class="btn submitButton" type="submit">Log Out</button>
+        </form>
     </div>
 </div>
-<br>
-<hr class="border-1 border-grey">
+<div class="row container-fluid">
+    <br>
+</div>
+<div class="container-fluid">
+    <div class="row container-fluid">
+        <div class="col"></div>
+        <div class="col text-center">
+            <h1>User List</h1>
+        </div>
+        <div class="col"></div>
+    </div>
+    <hr class="border-grey border-1">
+    <div class="row container-fluid text-center">
+        <div class="col">
+            <img src="https://www.shareicon.net/download/2017/05/24/886412_user.ico">
+            <form>
+                <button type="submit" class="btn">Name</button>
+            </form>
+        </div>
+        <div class="col text-right">
+            <div class="row text-right">
+                <form>
+                    <button type="submit" class="btn btn-danger">
+                        Block perma
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="col text-left">
+            <form>
+                <button type="submit" class="btn btn-danger">
+                    Block 15 days
+                </button>
+            </form>
+        </div>
+    </div>
+    <hr class="border-grey border-1">
+</div>
 </body>
 </html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebShop</title>
+    <title><%= title %></title>
     <link rel="icon" href="https://icon-library.com/images/online-store-icon/online-store-icon-3.jpg">
-    <link rel='stylesheet' href='/stylesheets/error.css' />
+    <link rel='stylesheet' href='/stylesheets/singleProduct.css' />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
 </head>
 <body>
@@ -14,10 +14,10 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
+                <a class="nav-link" href="/login">Login <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/registration">Registration</a>
@@ -36,15 +36,24 @@
 <hr class="border-1 border-grey">
 <br>
 <div class="row container-fluid">
-    <div class="col text-center">
-        <img src="https://pbs.twimg.com/profile_images/1049456976248365057/4dZBsdT0_400x400.jpg">
+    <div class="col text-right align-middle">
+        <h1><%= product[0].product_name %></h1>
+        <h2><%= product[0].price %>$</h2>
+        <p><%= product[0].description %></p>
     </div>
     <div class="col">
-        <h1>You don't have that permission :(</h1>
-        <h4>Sorry!</h4>
+        <img src="https://images.meesho.com/images/products/126852734/l0qw1_256.jpg">
     </div>
 </div>
 <br>
-<hr class="border-1 border-grey">
+<hr class="border-grey border-1">
+<br>
+<div class="row container-fluid text-center">
+    <div class="col">
+        <form action="/add-to-basket/<%= product[0].product_id%>" method="post">
+            <button type="submit" class="btn submitButton">ADD TO BASKET</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
