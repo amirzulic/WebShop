@@ -47,9 +47,20 @@
         <br>
         <hr class="border-1 border-grey">
         <br>
-        <form method="get" action="/orders">
-            <button type="submit" class="btn submitButton">MY ORDERS</button>
-        </form>
+        <div class="row">
+            <div class="col">
+                <form method="get" action="/orders">
+                    <button type="submit" class="btn submitButton">MY ORDERS</button>
+                </form>
+            </div>
+            <div class="col">
+                <form method="get" action="/messages">
+                    <button type="submit" class="btn submitButton">
+                        MESSAGES
+                    </button>
+                </form>
+            </div>
+        </div>
         <br>
         <form method="get" action="/products/add">
             <button type="submit" class="btn submitButton">ADD NEW PRODUCT</button>

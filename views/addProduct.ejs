@@ -51,8 +51,9 @@
                 <label for="category">Choose category</label>
                 <select class="form-select" id="category" name="category">
                     <option selected>Choose</option>
-                    <option value="1">Category1</option>
-                    <option value="2">Category2</option>
+                    <% for(let i = 0; i < categories.length; i++) { %>
+                    <option value="<%=categories[i].category_id%>"><%= categories[i].name %></option>
+                    <% } %>
                 </select>
             </div>
             <div class="form-group">

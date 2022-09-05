@@ -49,35 +49,59 @@
         <div class="col"></div>
     </div>
     <hr class="border-grey border-1">
+    <% for(let i = 0; i < orders.length; i++) { %>
     <div class="row container-fluid text-center">
         <div class="col">
-            <img src="https://ipcdn.freshop.com/resize?url=https://images.freshop.com/1564405684711917285/67f70d388d67a61d337a0b707d695cf4_large.png&width=256&type=webp&quality=80">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN7FRd3QDPTxmko4iTlXnDv91rPSdiv8eNZQ&usqp=CAU">
             <form method="get" action="/product">
-                <button type="submit" class="btn">Umbrella</button>
+                <button type="submit" class="btn"><%= orders[i].products%></button>
             </form>
         </div>
         <div class="col text-right">
             <div class="row text-right">
                 <h4 class="pr-2">Status</h4>
-                <form>
-                    <button type="submit" class="btn submitButton">
-                        Delivered
-                    </button>
-                </form>
+                <% if(orders[i].status === 1) {%>
+                    <h5 class="text-warning">PENDING</h5>
+                <% } else if(orders[i].status === 2) { %>
+                    <h5 class="text-primary">ACCEPTED</h5>
+                <% } else { %>
+                    <h5 class="text-success">DELIVERED</h5>
+                <% } %>
             </div>
         </div>
         <div class="col text-left">
-            <form>
-                <button type="submit" class="btn btn-danger">
-                    Delete
-                </button>
-                <button type="submit" class="btn submitButton">
-                    Accept
-                </button>
-            </form>
+            <div class="row">
+                <% if(orders[i].status === 1) { %>
+                <div class="col">
+                    <form action="/accept-order/<%= orders[i].order_id %>?_method=UPDATE" method="POST">
+                        <button type="submit" class="btn submitButton">
+                            Accept
+                        </button>
+                    </form>
+                </div>
+                <% } else if(orders[i].status === 2) { %>
+                <div class="col">
+                    <form action="/delivered/<%= orders[i].order_id %>?_method=UPDATE" method="POST">
+                        <button type="submit" class="btn btn-primary">
+                            Delivered
+                        </button>
+                    </form>
+                </div>
+                    <% }  else { %>
+                    <% } %>
+                <div class="col">
+                    <form action="/delete-order/<%= orders[i].order_id %>?_method=UPDATE" method="POST">
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     <hr class="border-grey border-1">
+    <br>
+    <% } %>
 </div>
 </body>
 </html>

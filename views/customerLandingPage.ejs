@@ -60,12 +60,14 @@
         <div class="col"></div>
     </div>
     <div class="row container-fluid text-center">
+        <% for(let i = 0; i < popular.length; i++) { %>
         <div class="col">
-            <img src="https://ipcdn.freshop.com/resize?url=https://images.freshop.com/1564405684711917285/67f70d388d67a61d337a0b707d695cf4_large.png&width=256&type=webp&quality=80">
-            <form method="get" action="/product">
-                <button type="submit" class="btn">Umbrella</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN7FRd3QDPTxmko4iTlXnDv91rPSdiv8eNZQ&usqp=CAU">
+            <form method="get" action="/product/<%= popular[i].product_id %>">
+                <button type="submit" class="btn"><b><%= popular[i].product_name %></b></button>
             </form>
         </div>
+        <% } %>
     </div>
 </div>
 <div class="row container-fluid">
@@ -83,9 +85,9 @@
     <div class="row container-fluid text-center">
         <% for(let i = 0; i < random.length; i++) { %>
             <div class="col">
-                <img src="https://cdn.shopify.com/s/files/1/0614/6303/6135/products/WT2010000C8802_02_256x.jpg?v=1651131333">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN7FRd3QDPTxmko4iTlXnDv91rPSdiv8eNZQ&usqp=CAU">
                 <form method="get" action="/product/<%= random[i].product_id %>">
-                    <button type="submit" class="btn"><%= random[i].product_name %></button>
+                    <button type="submit" class="btn"><b><%= random[i].product_name %></b></button>
                 </form>
             </div>
         <% } %>
@@ -106,13 +108,14 @@
     <div class="row container-fluid text-center">
         <% for(let i = 0; i < recommended.length; i++) { %>
         <div class="col">
-            <img src="https://i.pinimg.com/736x/80/9f/d6/809fd6e369ff849c90e8f52defaa6f55--same-day-flower-delivery-gift-delivery.jpg">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN7FRd3QDPTxmko4iTlXnDv91rPSdiv8eNZQ&usqp=CAU">
             <form method="get" action="/product/<%= recommended[i].product_id%>">
-                <button type="submit" class="btn"><%= recommended[i].product_name%></button>
+                <button type="submit" class="btn"><b><%= recommended[i].product_name%></b></button>
             </form>
         </div>
         <% } %>
     </div>
+    <br>
 </div>
 </body>
 </html>

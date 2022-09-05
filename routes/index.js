@@ -8,6 +8,15 @@ const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
 const methodOverride = require('method-override');
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  host: 'gmail',
+  auth: {
+    user: 'zulica7@gmail.com',
+    pass: 'xbdvuxwprgbxcdqi'
+  }
+});
 
 router.use(flash());
 router.use(session({
@@ -132,7 +141,25 @@ router.get('/', checkAuthenticated, function(req, res, next) {
               if (err) {
                 console.info(err);
               } else {
-                res.render('customerLandingPage', {title: "WebShop", user: req.user.first_name, random: random.rows, recommended: recommended.rows});
+                pool.connect(function (err, client, done) {
+                  if (err) {
+                    res.end('{"error" : "Error", "status": 500}');
+                  }
+                  client.query(`SELECT * FROM Product ORDER BY purchases DESC LIMIT 3;;`, [], function (err, popular) {
+                    done();
+                    if (err) {
+                      console.info(err);
+                    } else {
+                      res.render('customerLandingPage', {
+                        title: "WebShop",
+                        user: req.user.first_name,
+                        random: random.rows,
+                        recommended: recommended.rows,
+                        popular: popular.rows
+                      });
+                    }
+                  });
+                });
               }
             });
           });
@@ -254,7 +281,19 @@ router.get('/orders', checkAuthenticated, function(req, res, next) {
       });
     });
   } else if(req.user.user_type === 1) {
-    res.render('sellerOrders', {title: "WebShop", user: req.user});
+    pool.connect(function (err, client, done) {
+      if (err) {
+        res.end('{"error" : "Error", "status": 500}');
+      }
+      client.query(`SELECT * FROM "Order" WHERE seller_id = '${req.user.user_id}';`, [], function (err, result) {
+        done();
+        if (err) {
+          console.info(err);
+        } else {
+          res.render('sellerOrders', {title: "WebShop", user: req.user, orders: result.rows});
+        }
+      });
+    });
   } else {
     res.render('error', {title: "WebShop"});
   }
@@ -282,7 +321,19 @@ router.get('/users', checkAuthenticated, function(req, res, next) {
 
 router.get('/products/add', checkAuthenticated, function(req, res, next) {
   if(req.user.user_type === 1) {
-    res.render('addProduct', {title: "WebShop", user: req.user});
+    pool.connect(function (err, client, done) {
+      if (err) {
+        res.end('{"error" : "Error", "status": 500}');
+      }
+      client.query(`SELECT * FROM Category;`, [], function (err, result) {
+        done();
+        if (err) {
+          console.info(err);
+        } else {
+          res.render('addProduct', {title: "WebShop", user: req.user, categories: result.rows});
+        }
+      });
+    });
   } else {
     res.render('error', {title: "WebShop"});
   }
@@ -299,8 +350,8 @@ router.post('/add-product', checkAuthenticated, function(req, res, next) {
     if (err) {
       res.end('{"error" : "Error", "status": 500}');
     }
-    client.query(`INSERT INTO Product(product_name, price, product_category, description, seller_id)
-      VALUES ('${productName}', '${price}', '${category}', '${description}', '${userId}');`, [], function (err, result) {
+    client.query(`INSERT INTO Product(product_name, price, description, seller_id, category_id, purchases)
+      VALUES ('${productName}', '${price}', '${description}', '${userId}', '${category}', 0);`, [], function (err, result) {
       done();
       if (err) {
         console.info(err);
@@ -325,7 +376,19 @@ router.post('/add-to-basket/:id', checkAuthenticated, function(req, res, next) {
       if (err) {
         console.info(err);
       } else {
-        res.redirect("/");
+        pool.connect(function (err, client, done) {
+          if (err) {
+            res.end('{"error" : "Error", "status": 500}');
+          }
+          client.query(`UPDATE Product SET purchases = purchases + 1 WHERE product_id = '${productId}';`, [], function (err, result) {
+            done();
+            if (err) {
+              console.info(err);
+            } else {
+              res.redirect("/");
+            }
+          });
+        });
       }
     });
   });
@@ -359,6 +422,28 @@ router.post('/create-order/:products/:seller', checkAuthenticated, function(req,
             if (err) {
               console.info(err);
             } else {
+              var transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true, // use SSL
+                auth: {
+                  user: 'zulica7@gmail.com',
+                  pass: ''
+                }
+              });
+              var mailOptions = {
+                from: 'zulica7@gmail.com',
+                to: 'zulicic0@gmail.com',
+                subject: 'WebShop Purchase',
+                text: 'Your order is created! Wait for the store to accept it!'
+              };
+              transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+              });
               res.redirect("/orders");
             }
           });
@@ -501,6 +586,148 @@ router.post('/change-name', checkAuthenticated, function(req, res, next) {
         console.info(err);
       } else {
         res.redirect("/profile");
+      }
+    });
+  });
+});
+
+router.post('/change-email', checkAuthenticated, function(req, res, next) {
+  let email = req.body.email;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`UPDATE "User" SET email = '${email}' WHERE user_id = ${req.user.user_id};`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/profile");
+      }
+    });
+  });
+});
+
+router.post('/accept-order/:id', checkAuthenticated, function(req, res, next) {
+  let orderId = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`UPDATE "Order" SET status = 2 WHERE order_id = ${orderId};`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        var transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true, // use SSL
+          auth: {
+            user: 'zulica7@gmail.com',
+            pass: ''
+          }
+        });
+        var mailOptions = {
+          from: 'zulica7@gmail.com',
+          to: 'zulicic0@gmail.com',
+          subject: 'WebShop Purchase',
+          text: 'Your order accepted! You will be hearing from us soon!'
+        };
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+        res.redirect("/orders");
+      }
+    });
+  });
+});
+
+router.post('/delivered/:id', checkAuthenticated, function(req, res, next) {
+  let orderId = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`UPDATE "Order" SET status = 3 WHERE order_id = ${orderId};`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/orders");
+      }
+    });
+  });
+});
+
+router.post('/delete-order/:id', checkAuthenticated, function(req, res, next) {
+  let orderId = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`DELETE FROM "Order" WHERE order_id = '${orderId}';`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/orders");
+      }
+    });
+  });
+});
+
+router.post('/send-message/:id', checkAuthenticated, function(req, res, next) {
+  let userId = req.params.id;
+  let message = req.body.message;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`INSERT INTO Message(sender, user_id, message)
+      VALUES ('${req.user.first_name}', '${userId}', '${message}');`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/");
+      }
+    });
+  });
+});
+
+router.get('/messages', checkAuthenticated, function(req, res, next) {
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`SELECT * FROM Message WHERE user_id = '${req.user.user_id}';`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.render('messages', {title: "WebShop", user: req.user, messages: result.rows});
+      }
+    });
+  });
+});
+
+router.post('/delete-product/:id', checkAuthenticated, function(req, res, next) {
+  let productId = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`DELETE FROM Product WHERE product_id = '${productId}';`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/catalog");
       }
     });
   });

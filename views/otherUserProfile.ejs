@@ -52,6 +52,21 @@
         <div class="col"></div>
     </div>
     <br>
+    <% if(user.user_type === 3) { %>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col w-100 text-center">
+                <form method="post" action="/send-message/<%= profile[0].user_id %>">
+                    <div class="form-group">
+                        <label for="message"><b>Send a message to <%= profile[0].first_name %></b></label>
+                        <textarea class="form-control" id="message" rows="3" name="message"></textarea>
+                    </div>
+                    <button class="btn submitButton" type="submit">SEND</button>
+                </form>
+            </div>
+            <div class="col"></div>
+        </div>
+    <% } %>
 </div>
 </body>
 </html>

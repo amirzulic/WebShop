@@ -59,18 +59,24 @@
             </div>
             <div class="col text-right">
                 <h4>Status: <% if(products[i].status === 1) { %>
-                        <b>Active</b>
+                        <b class="text-warning">Pending</b>
+                    <% } else if(products[i].status === 2) { %>
+                        <b class="text-primary">Accepted</b>
                     <% } else { %>
-                        <b>Delivered</b>
+                        <b class="text-success">Delivered</b>
                     <% } %>
                 </h4>
             </div>
             <div class="col text-left">
-                <form>
+                <% if(products[i].status === 3) { %>
+
+                <% } else { %>
+                <form action="/delete-order/<%= products[i].order_id %>?_method=UPDATE" method="POST">
                     <button type="submit" class="btn btn-danger">
                         Delete
                     </button>
                 </form>
+                <% } %>
             </div>
         </div>
     <% } %>
