@@ -733,4 +733,21 @@ router.post('/delete-product/:id', checkAuthenticated, function(req, res, next) 
   });
 });
 
+router.post('/block-user/:id', checkAuthenticated, function(req, res, next) {
+  let userId = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`DELETE FROM "User" WHERE user_id = '${userId}';`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/");
+      }
+    });
+  });
+});
+
 module.exports = router;
