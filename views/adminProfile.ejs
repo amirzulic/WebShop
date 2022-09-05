@@ -26,8 +26,10 @@
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="form-inline my-2 my-lg-0" method="post" action="/search">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+                   id="search" name="search"
+            >
             <button class="btn submitButton my-2 my-sm-0" type="submit">SEARCH</button>
         </form>
     </div>
@@ -35,13 +37,21 @@
 <br>
 <div class="row container-fluid">
     <div class="col text-center">
-        <img src="https://i.pinimg.com/736x/bc/75/88/bc75882d906b263fbe0550fe59dc7b21.jpg">
+        <img src="https://assets.stickpng.com/thumbs/585e4be1cb11b227491c3398.png">
     </div>
     <div class="col text-left">
         <h1>Admin first name: <b><%= user.first_name %></b></h1>
         <h1>Admin last name: <%= user.last_name %></h1>
         <br>
         <h4>Admin email: <%= user.email %></h4>
+        <br>
+        <hr class="border-1 border-grey">
+        <br>
+        <form method="get" action="/statistics">
+            <button type="submit" class="btn submitButton">
+                STATISTICS
+            </button>
+        </form>
     </div>
 </div>
 </body>

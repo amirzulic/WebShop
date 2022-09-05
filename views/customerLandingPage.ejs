@@ -26,8 +26,10 @@
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="form-inline my-2 my-lg-0" method="post" action="/search">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+                   id="search" name="search"
+            >
             <button class="btn submitButton my-2 my-sm-0" type="submit">SEARCH</button>
         </form>
     </div>
@@ -79,11 +81,11 @@
         <div class="col"></div>
     </div>
     <div class="row container-fluid text-center">
-        <% for(let i = 0; i < product.length; i++) { %>
+        <% for(let i = 0; i < random.length; i++) { %>
             <div class="col">
                 <img src="https://cdn.shopify.com/s/files/1/0614/6303/6135/products/WT2010000C8802_02_256x.jpg?v=1651131333">
-                <form method="get" action="/product/<%= product[i].product_id %>">
-                    <button type="submit" class="btn"><%= product[i].product_name %></button>
+                <form method="get" action="/product/<%= random[i].product_id %>">
+                    <button type="submit" class="btn"><%= random[i].product_name %></button>
                 </form>
             </div>
         <% } %>
@@ -102,12 +104,14 @@
         <div class="col"></div>
     </div>
     <div class="row container-fluid text-center">
+        <% for(let i = 0; i < recommended.length; i++) { %>
         <div class="col">
             <img src="https://i.pinimg.com/736x/80/9f/d6/809fd6e369ff849c90e8f52defaa6f55--same-day-flower-delivery-gift-delivery.jpg">
-            <form method="get" action="/product">
-                <button type="submit" class="btn">Bag</button>
+            <form method="get" action="/product/<%= recommended[i].product_id%>">
+                <button type="submit" class="btn"><%= recommended[i].product_name%></button>
             </form>
         </div>
+        <% } %>
     </div>
 </div>
 </body>

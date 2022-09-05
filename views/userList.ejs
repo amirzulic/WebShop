@@ -26,8 +26,10 @@
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="form-inline my-2 my-lg-0" method="post" action="/search">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+                   id="search" name="search"
+            >
             <button class="btn submitButton my-2 my-sm-0" type="submit">SEARCH</button>
         </form>
     </div>
@@ -37,7 +39,7 @@
 </div>
 <div class="row container-fluid">
     <div class="col">
-        <h3>Hi <%= user %></h3>
+        <h3>Hi, <b><%= user.first_name %></b></h3>
     </div>
     <div class="col text-right">
         <form action="/logout?_method=DELETE" method="POST">
@@ -56,13 +58,21 @@
         </div>
         <div class="col"></div>
     </div>
+    <% for(let i = 0; i < users.length; i++) {%>
     <hr class="border-grey border-1">
     <div class="row container-fluid text-center">
         <div class="col">
             <img src="https://www.shareicon.net/download/2017/05/24/886412_user.ico">
-            <form>
-                <button type="submit" class="btn">Name</button>
+            <form method="get" action="/profile/<%= users[i].user_id%>">
+                <button type="submit" class="btn"><%= users[i].first_name %></button>
             </form>
+            <%if(users[i].user_type === 1) {%>
+                <h5 class="text-primary">Seller</h5>
+            <% } else if(users[i].user_type === 2) { %>
+                <h5 class="text-warning">Customer</h5>
+            <% } else { %>
+                <h5 class="text-danger">Admin</h5>
+            <% } %>
         </div>
         <div class="col text-right">
             <div class="row text-right">
@@ -81,6 +91,7 @@
             </form>
         </div>
     </div>
+    <% } %>
     <hr class="border-grey border-1">
 </div>
 </body>

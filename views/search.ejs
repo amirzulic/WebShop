@@ -3,7 +3,7 @@
 <head>
     <title><%= title %></title>
     <link rel="icon" href="https://icon-library.com/images/online-store-icon/online-store-icon-3.jpg">
-    <link rel='stylesheet' href='/stylesheets/basket.css' />
+    <link rel='stylesheet' href='/stylesheets/search.css' />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
 </head>
 <body>
@@ -35,20 +35,54 @@
     </div>
 </nav>
 <br>
-<div class="container-fluid">
+<div class="container-fluid text-center">
     <div class="row">
         <div class="col"></div>
         <div class="col text-center">
-            <h1><%= name %>'s Basket</h1>
+            <h1>Products</h1>
         </div>
         <div class="col"></div>
     </div>
     <br>
-    <div class="row text-center">
-        <div class="col">
-            <h1>Your basket is empty!</h1>
-        </div>
+    <div class="row">
+        <% for(let i = 0; i < products.length; i++) { %>
+            <div class="col">
+                <img src="https://i.pinimg.com/736x/80/9f/d6/809fd6e369ff849c90e8f52defaa6f55--same-day-flower-delivery-gift-delivery.jpg">
+                <form method="get" action="/product/<%= products[i].product_id%>">
+                    <button type="submit" class="btn"><%= products[i].product_name%></button>
+                </form>
+            </div>
+        <% } %>
     </div>
+    <br>
+    <hr class="border-1 border-grey">
+    <br>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-center">
+            <h1>Stores</h1>
+        </div>
+        <div class="col"></div>
+    </div>
+    <br>
+    <div class="row">
+        <% for(let i = 0; i < users.length; i++) { %>
+            <div class="col">
+                <img src="https://www.shareicon.net/download/2017/05/24/886412_user.ico">
+                <form method="get" action="/profile/<%= users[i].user_id%>">
+                    <button type="submit" class="btn"><%= users[i].first_name%></button>
+                </form>
+                <%if(users[i].user_type === 1) {%>
+                    <h5 class="text-primary"><b>Seller</b></h5>
+                <% } else if(users[i].user_type === 2) { %>
+                    <h5 class="text-warning"><b>Customer</b></h5>
+                <% } else { %>
+                    <h5 class="text-danger"><b>Admin</b></h5>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+    <br>
 </div>
 </body>
 </html>

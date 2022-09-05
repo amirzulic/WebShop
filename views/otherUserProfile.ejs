@@ -3,7 +3,7 @@
 <head>
     <title><%= title %></title>
     <link rel="icon" href="https://icon-library.com/images/online-store-icon/online-store-icon-3.jpg">
-    <link rel='stylesheet' href='/stylesheets/customerProfile.css' />
+    <link rel='stylesheet' href='/stylesheets/otherUserProfile.css' />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
 </head>
 <body>
@@ -22,7 +22,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="/registration">Registration</a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
         </ul>
@@ -35,28 +35,23 @@
     </div>
 </nav>
 <br>
-<div class="row container-fluid">
-    <div class="col text-center">
-        <img src="https://assets.stickpng.com/thumbs/585e4be1cb11b227491c3398.png">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-center">
+            <img src="https://www.shareicon.net/download/2017/05/24/886412_user.ico">
+            <h1><b><%= profile[0].first_name + " " + profile[0].last_name%></b></h1>
+            <%if(profile[0].user_type === 1) {%>
+                <h5 class="text-primary"><b>Seller</b></h5>
+            <% } else if(profile[0].user_type === 2) { %>
+                <h5 class="text-warning"><b>Customer</b></h5>
+            <% } else { %>
+                <h5 class="text-danger"><b>Admin</b></h5>
+            <% } %>
+        </div>
+        <div class="col"></div>
     </div>
-    <div class="col text-left">
-        <h1>Customer first name: <b><%= user.first_name %></b></h1>
-        <h1>Customer last name: <%= user.last_name %></h1>
-        <br>
-        <h4>Customer email: <%= user.email %></h4>
-        <br>
-        <hr class="border-1 border-grey">
-        <br>
-        <form method="get" action="/orders">
-            <button type="submit" class="btn submitButton">MY ORDERS</button>
-        </form>
-        <br>
-        <form method="get" action="/basket">
-            <button type="submit" class="btn submitButton">
-                MY BASKET 🛒
-            </button>
-        </form>
-    </div>
+    <br>
 </div>
 </body>
 </html>

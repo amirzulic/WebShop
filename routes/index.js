@@ -57,7 +57,19 @@ router.get('/login', checkNotAuthenticated, function(req, res, next) {
 });
 
 router.get('/registration', checkNotAuthenticated, function(req, res, next) {
-  res.render('registration', { title: 'WebShop' });
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`SELECT * FROM Category;`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.render('registration', { title: 'WebShop', categories: result.rows});
+      }
+    });
+  });
 });
 
 router.post('/register', checkNotAuthenticated, function(req, res, next) {
@@ -101,16 +113,29 @@ router.delete('/logout', function(req, res, next) {
 
 router.get('/', checkAuthenticated, function(req, res, next) {
   if(req.user.user_type === 2) {
+    let interests = req.user.interests.split(",");
     pool.connect(function (err, client, done) {
       if (err) {
         res.end('{"error" : "Error", "status": 500}');
       }
-      client.query(`SELECT * FROM Product LIMIT 3;`, [], function (err, result) {
+      client.query(`SELECT * FROM Product LIMIT 3;`, [], function (err, random) {
         done();
         if (err) {
           console.info(err);
         } else {
-          res.render('customerLandingPage', {title: "WebShop", user: req.user.first_name, product: result.rows});
+          pool.connect(function (err, client, done) {
+            if (err) {
+              res.end('{"error" : "Error", "status": 500}');
+            }
+            client.query(`SELECT * FROM Product p INNER JOIN Category c on p.category_id = c.category_id WHERE c.name = '${interests[0]}';`, [], function (err, recommended) {
+              done();
+              if (err) {
+                console.info(err);
+              } else {
+                res.render('customerLandingPage', {title: "WebShop", user: req.user.first_name, random: random.rows, recommended: recommended.rows});
+              }
+            });
+          });
         }
       });
     });
@@ -118,7 +143,7 @@ router.get('/', checkAuthenticated, function(req, res, next) {
     res.redirect("/catalog");
     //res.render('sellerCatalog', {title: "WebShop", user: req.user});
   }  else {
-    res.render('userList', {title: "WebShop", user: req.user.first_name});
+    res.redirect("/users");
   }
 });
 
@@ -134,7 +159,6 @@ router.get('/product/:id', checkAuthenticated, function(req, res, next) {
       if (err) {
         console.info(err);
       } else {
-        console.info(result.rows);
         res.render('singleProduct', {title: "WebShop", user: req.user, product: result.rows});
       }
     });
@@ -181,6 +205,23 @@ router.get('/profile', checkAuthenticated, function(req, res, next) {
   }
 });
 
+router.get('/profile/:id', checkAuthenticated, function(req, res, next) {
+  let id = req.params.id;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`SELECT * FROM "User" WHERE user_id = '${id}';`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.render('otherUserProfile', {title: "WebShop", user: req.user, profile: result.rows})
+      }
+    });
+  });
+});
+
 router.get('/catalog', checkAuthenticated, function(req, res, next) {
   pool.connect(function (err, client, done) {
     if (err) {
@@ -191,7 +232,6 @@ router.get('/catalog', checkAuthenticated, function(req, res, next) {
       if (err) {
         console.info(err);
       } else {
-        console.info(result.rows)
         res.render('sellerCatalog', {title: "WebShop", user: req.user, products: result.rows});
       }
     });
@@ -222,7 +262,19 @@ router.get('/orders', checkAuthenticated, function(req, res, next) {
 
 router.get('/users', checkAuthenticated, function(req, res, next) {
   if(req.user.user_type === 3) {
-    res.render('userList', {title: "WebShop", user: req.user});
+    pool.connect(function (err, client, done) {
+      if (err) {
+        res.end('{"error" : "Error", "status": 500}');
+      }
+      client.query(`SELECT * FROM "User";`, [], function (err, result) {
+        done();
+        if (err) {
+          console.info(err);
+        } else {
+          res.render('userList', {title: "WebShop", user: req.user, users: result.rows});
+        }
+      });
+    });
   } else {
     res.render('error', {title: "WebShop"});
   }
@@ -315,4 +367,143 @@ router.post('/create-order/:products/:seller', checkAuthenticated, function(req,
     });
   });
 });
+
+router.get('/statistics', checkAuthenticated, function(req, res, next) {
+  if(req.user.user_type === 3) {
+    let adminCount = 0;
+    let sellerCount = 0;
+    let customerCount = 0;
+    let productCount = 0;
+    let orderCount = 0;
+    pool.connect(function (err, client, done) {
+      if (err) {
+        res.end('{"error" : "Error", "status": 500}');
+      }
+      client.query(`SELECT COUNT(user_id) from "User" WHERE user_type = 3;`, [], function (err, admin) {
+        done();
+        if (err) {
+          console.info(err);
+        } else {
+          adminCount = admin.rows[0].count;
+          pool.connect(function (err, client, done) {
+            if (err) {
+              res.end('{"error" : "Error", "status": 500}');
+            }
+            client.query(`SELECT COUNT(user_id) from "User" WHERE user_type = 2;`, [], function (err, customer) {
+              done();
+              if (err) {
+                console.info(err);
+              } else {
+                customerCount = customer.rows[0].count;
+                pool.connect(function (err, client, done) {
+                  if (err) {
+                    res.end('{"error" : "Error", "status": 500}');
+                  }
+                  client.query(`SELECT COUNT(user_id) from "User" WHERE user_type = 1;`, [], function (err, seller) {
+                    done();
+                    if (err) {
+                      console.info(err);
+                    } else {
+                      sellerCount = seller.rows[0].count;
+                      pool.connect(function (err, client, done) {
+                        if (err) {
+                          res.end('{"error" : "Error", "status": 500}');
+                        }
+                        client.query(`SELECT COUNT(product_id) from Product;`, [], function (err, product) {
+                          done();
+                          if (err) {
+                            console.info(err);
+                          } else {
+                            productCount = product.rows[0].count;
+                            pool.connect(function (err, client, done) {
+                              if (err) {
+                                res.end('{"error" : "Error", "status": 500}');
+                              }
+                              client.query(`SELECT COUNT(order_id) from "Order";`, [], function (err, order) {
+                                done();
+                                if (err) {
+                                  console.info(err);
+                                } else {
+                                  orderCount = order.rows[0].count;
+                                  res.render('adminStatistics', {
+                                    title: "WebShop",
+                                    user: req.user,
+                                    adminCount: adminCount,
+                                    sellerCount: sellerCount,
+                                    customerCount: customerCount,
+                                    productCount: productCount,
+                                    orderCount: orderCount
+                                  });
+                                }
+                              });
+                            });
+                          }
+                        });
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          });
+        }
+      });
+    });
+  } else {
+    res.render('error', {title: "WebShop"});
+  }
+});
+
+router.post('/search', checkAuthenticated, function(req, res, next) {
+  let search = req.body.search;
+  res.redirect("/search-result/" + search)
+});
+
+router.get('/search-result/:search', checkAuthenticated, function(req, res, next) {
+  let search = req.params.search;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`SELECT * FROM Product WHERE product_name LIKE '%${search}%';`, [], function (err, products) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        pool.connect(function (err, client, done) {
+          if (err) {
+            res.end('{"error" : "Error", "status": 500}');
+          }
+          client.query(`SELECT * FROM "User" WHERE first_name LIKE '%${search}%';`, [], function (err, users) {
+            done();
+            if (err) {
+              console.info(err);
+            } else {
+              res.render('search', {title: "WebShop", user: req.user, products: products.rows, users: users.rows});
+            }
+          });
+        });
+      }
+    });
+  });
+});
+
+router.post('/change-name', checkAuthenticated, function(req, res, next) {
+  let firstName = req.body.firstName;
+  let lastName = req.body.lastName;
+  pool.connect(function (err, client, done) {
+    if (err) {
+      res.end('{"error" : "Error", "status": 500}');
+    }
+    client.query(`UPDATE "User" SET first_name = '${firstName}', last_name = '${lastName}' WHERE user_id = ${req.user.user_id};`, [], function (err, result) {
+      done();
+      if (err) {
+        console.info(err);
+      } else {
+        res.redirect("/profile");
+      }
+    });
+  });
+});
+
 module.exports = router;

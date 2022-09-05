@@ -26,8 +26,10 @@
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="form-inline my-2 my-lg-0" method="post" action="/search">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+                   id="search" name="search"
+            >
             <button class="btn submitButton my-2 my-sm-0" type="submit">SEARCH</button>
         </form>
     </div>
@@ -35,11 +37,11 @@
 <br>
 <div class="row container-fluid">
     <div class="col text-center">
-        <img src="https://i.pinimg.com/736x/bc/75/88/bc75882d906b263fbe0550fe59dc7b21.jpg">
+        <img src="https://assets.stickpng.com/thumbs/585e4be1cb11b227491c3398.png">
     </div>
     <div class="col text-left">
         <h1>Seller first name: <b><%= user.first_name %></b></h1>
-        <h1>Seller last name: <%= user.last_name %></h1>
+        <h1>Seller last name: <b><%= user.last_name %></b></h1>
         <br>
         <h4>Seller email: <%= user.email %></h4>
         <br>
@@ -52,6 +54,27 @@
         <form method="get" action="/products/add">
             <button type="submit" class="btn submitButton">ADD NEW PRODUCT</button>
         </form>
+        <br>
+        <hr class="border-1 border-grey">
+        <br>
+        <div class="row text-center">
+            <div class="col">
+                <h3>Want to change store name?</h3>
+                <form action="/change-name?_method=UPDATE" method="POST">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="firstName" name="firstName"
+                               placeholder="First Name"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="lastName" name="lastName"
+                               placeholder="Last Name"
+                        >
+                    </div>
+                    <button type="submit" class="btn submitButton">CHANGE</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 </body>
